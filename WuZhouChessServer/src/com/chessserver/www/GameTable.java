@@ -36,6 +36,18 @@ public class GameTable {
 		
 	}
 
+	/**
+	 * @param name
+	 * @param iD
+	 */
+	public GameTable(String name, int iD) {
+		super();
+		this.name = name;
+		ID = iD;
+		playerNum=0;
+		status=TABLE_STATUS_WAITING;
+	}
+
 	public GameTable(JSONObject jsonObject) {
 		// TODO Auto-generated constructor stub
 		name=jsonObject.getString(NameKey);
@@ -69,6 +81,15 @@ public class GameTable {
 	
 	public void inTable(PlayerAgent player)
 	{
+		if(playerNum==0)
+		{
+			player1=player.getGamePlayer();
+		}
+		else if(playerNum==1)
+		{
+			player2=player.getGamePlayer();
+			playerNum=2;
+		}
 		
 	}
 	
@@ -112,12 +133,6 @@ public class GameTable {
 		return player1;
 	}
 
-	/**
-	 * @param player1 the player1 to set
-	 */
-	public void setPlayer1(GamePlayer player1) {
-		this.player1 = player1;
-	}
 
 	/**
 	 * @return the player2
@@ -126,25 +141,12 @@ public class GameTable {
 		return player2;
 	}
 
-	/**
-	 * @param player2 the player2 to set
-	 */
-	public void setPlayer2(GamePlayer player2) {
-		this.player2 = player2;
-	}
 
 	/**
 	 * @return the playerNum
 	 */
 	public int getPlayerNum() {
 		return playerNum;
-	}
-
-	/**
-	 * @param playerNum the playerNum to set
-	 */
-	public void setPlayerNum(int playerNum) {
-		this.playerNum = playerNum;
 	}
 
 	/**

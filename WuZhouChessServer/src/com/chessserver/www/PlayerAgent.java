@@ -134,6 +134,20 @@ public class PlayerAgent extends Thread {
 				}
 			}
 			break;
+		case SignalingMessage.SIGNALING_TYPE_INFO_REQ:
+			//客户端请求gameHall信息
+			InformationMessage gameHallMsg=new InformationMessage(InformationMessage.INFORMATION_TYPE_HALL,gameHall,gameTable,gamePlayer);
+			SignalingMessage msg=new SignalingMessage(SignalingMessage.SIGNALING_TYPE_INFO_RSP,gameHallMsg);
+			sendMessage(msg);
+			break;
+		case SignalingMessage.SIGNALING_TYPE_CREATE_TABLE:
+			//客户端创建新的gameTable,把table信息保存到agnet中，同时更新gameHall的table列表
+			InformationMessage tableMsg=sMsg.getInformation();
+			gameTable=tableMsg.getGameTable();
+			gameHall.newTable(this);
+			break;
+		case SignalingMessage.SIGNALING_TYPE_IN_TABLE:
+			break;
 		}
 	}
 

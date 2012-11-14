@@ -52,6 +52,9 @@ public class GameHall {
 		playerList.put(player.getPlayerName(),player);
 		player.setGameHall(this);
 		currentPlayerNum++;
+		
+//		tableList.add(newTable(player));
+		
 		System.out.println(player.getPlayerName()+" get in the GameHall "+name);
 	}
 	
@@ -72,12 +75,13 @@ public class GameHall {
 	 */
 	public GameTable newTable(PlayerAgent player)
 	{
-		GameTable table=new GameTable();
-		//按创建table的人的名字来命令table
-		table.setName(player.getName());
-		System.out.println("new table "+ table.getName()+" by "+player.getName());
-		currentTableNum++;
-		table.inTable(player);// 创建后自动进入房间				
+		GameTable table=player.getGameTable();
+		if(table!=null)
+		{
+			System.out.println("new table "+ table.getName()+" by "+player.getPlayerName());
+			currentTableNum++;
+			tableList.add(table);
+		}
 		return table;
 	}
 
@@ -108,6 +112,8 @@ public class GameHall {
 		ID=json.getInt(IDKey);
 		currentPlayerNum=json.getInt(PlayerNumKey);
 		currentTableNum=json.getInt(TableNumKey);
+		playerList=new HashMap<String,PlayerAgent>();
+		tableList=new ArrayList<GameTable>();
 		JSONArray jsonArray=json.getJSONArray(TableListKey);
 		for(int i=0;i<jsonArray.size();i++)
 		{

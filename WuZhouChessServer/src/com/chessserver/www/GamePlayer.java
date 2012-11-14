@@ -21,13 +21,27 @@ public class GamePlayer {
 	final static String GenderKey="GenderKey";
 	private final static int GENDER_MALE=1;
 	private final static int GENDER_FEMALE=2;
-	
+	public int status;
+	public final static int STATUS_NULL=0;
+	public final static int STATUS_WAITING=1;
+	public final static int STATUS_READY=2;
+	public final static int STATUS_PLAYING=3;
+	final static String StatusKey="StatusKey";
 	/**
 	 * 
 	 */
 	public GamePlayer() {
-		super();
 		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @param name
+	 * @param gender
+	 */
+	public GamePlayer(String name, int gender) {
+		this.name = name;
+		this.gender = gender;
+		status=STATUS_NULL;
 	}
 
 	/**
@@ -38,7 +52,8 @@ public class GamePlayer {
 		name=jsonObject.getString(NameKey);
 		ID=jsonObject.getInt(IDKey);
 		score=jsonObject.getInt(ScoreKey);
-		gender=jsonObject.getInt(GenderKey);		
+		gender=jsonObject.getInt(GenderKey);
+		status=jsonObject.getInt(StatusKey);
 	}
 	
 	public JSONObject toJSONObject()
@@ -48,6 +63,7 @@ public class GamePlayer {
 		json.put(IDKey, ID);
 		json.put(ScoreKey, score);
 		json.put(GenderKey, gender);
+		json.put(StatusKey, status);
 		return json;
 	}
 	
