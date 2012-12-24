@@ -21,12 +21,15 @@ public class GamePlayer {
 	final static String GenderKey="GenderKey";
 	private final static int GENDER_MALE=1;
 	private final static int GENDER_FEMALE=2;
+	public int color;
+	final static String ColorKey="ColorKey";
 	public int status;
 	public final static int STATUS_NULL=0;
 	public final static int STATUS_WAITING=1;
 	public final static int STATUS_READY=2;
 	public final static int STATUS_PLAYING=3;
 	final static String StatusKey="StatusKey";
+	
 	/**
 	 * 
 	 */
@@ -53,6 +56,7 @@ public class GamePlayer {
 		ID=jsonObject.getInt(IDKey);
 		score=jsonObject.getInt(ScoreKey);
 		gender=jsonObject.getInt(GenderKey);
+		color=jsonObject.getInt(ColorKey);
 		status=jsonObject.getInt(StatusKey);
 	}
 	
@@ -63,6 +67,7 @@ public class GamePlayer {
 		json.put(IDKey, ID);
 		json.put(ScoreKey, score);
 		json.put(GenderKey, gender);
+		json.put(ColorKey,color);
 		json.put(StatusKey, status);
 		return json;
 	}

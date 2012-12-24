@@ -72,6 +72,8 @@ public class GameHall {
 	/**player在Gamehall中选择创建新的table
 	 * @param player
 	 * @return 新创建的GameTable句柄
+	 * 用户创建新的gameTable
+	 * 将gameTable添加到tableList中
 	 */
 	public GameTable newTable(PlayerAgent player)
 	{
@@ -80,7 +82,7 @@ public class GameHall {
 		{
 			System.out.println("new table "+ table.getName()+" by "+player.getPlayerName());
 			currentTableNum++;
-			tableList.add(table);
+			tableList.add(table);	
 		}
 		return table;
 	}
@@ -88,19 +90,41 @@ public class GameHall {
 	/**player进入GameTable
 	 * @param table
 	 * @param player
-	 * @return 进入结果
+	 * @return 返回所进入的gameTable对象
+	 * 1.在tableList中找到要进入的table
+	 * 2.调用table的inTable函数，使玩家进入table中
 	 */
-	public boolean inTable(GameTable table, PlayerAgent player)
+	public GameTable inTable(GameTable table, PlayerAgent player)
 	{
-		return false;
+		GameTable gameTable=null;
+		int i=0;
+		for(i=0;i<tableList.size();i++)
+		{
+			gameTable=tableList.get(i);
+			if(table.name.equals(tableList.get(i).name))break;
+		}
+		if(i>tableList.size())return null;
+		return gameTable;
 	}
 	/**用户退出table
 	 * @param table
 	 * @param player
+	 * 1.在tableList中找到要退出的table
+	 * 2.调用table中的outTable函数，使玩家退出table
+	 * 3.检查table中的用户数，如果为0，则删除该table
 	 */
-	public void outTable(GameTable table, PlayerAgent player)
+	public boolean outTable(GameTable table, PlayerAgent player)
 	{
-		
+		GameTable gameTable=null;
+		int i=0;
+		for(i=0;i<tableList.size();i++)
+		{
+			gameTable=tableList.get(i);
+			if(table.name.equals(tableList.get(i).name))break;
+		}
+		if(i>tableList.size())return false;
+		if(gameTable.playerNum==0)tableList.remove(i);
+		return true;
 	}
 	
 	/**

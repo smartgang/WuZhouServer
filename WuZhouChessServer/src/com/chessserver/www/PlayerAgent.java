@@ -23,6 +23,7 @@ public class PlayerAgent extends Thread {
 	private GameHall gameHall;
 	private GameTable gameTable;
 	private GamePlayer gamePlayer;
+	private PlayerAgent opponentPlayer;
 	//玩家的状态 
 	private int internetStatus;
 	final static int INTERNET_STATUS_INITIAL=0;
@@ -85,7 +86,7 @@ public class PlayerAgent extends Thread {
 		}
 	}
 
-	private void sendMessage(MessageBody msg)
+	public void sendMessage(MessageBody msg)
 	{
 		try {
 			System.out.println(msg.toString());
@@ -105,9 +106,11 @@ public class PlayerAgent extends Thread {
 		
 	}
 
+	//DATA是游戏 过程中的数据，包括movement,以及游戏 的控制信息
 	private void processData(DataMessage dataMessage) {
 		// TODO Auto-generated method stub
-		
+		//1.将游戏内容直接转发给对方
+		if(opponentPlayer!=null)opponentPlayer.sendMessage(dataMessage);
 	}
 
 	private void processSignaling(SignalingMessage sMsg) {
@@ -128,7 +131,7 @@ public class PlayerAgent extends Thread {
 				if(gamePlayer!=null)
 				{
 					gameHall.playerIn(this);//进入大厅
-					playerMsg=new InformationMessage(InformationMessage.INFORMATION_TYPE_HALL,gameHall,gameTable,gamePlayer);
+					playerMsg=new InformationMessage(InformationMessage.INFORMATION_TYPE_HALL,gameHall,null,null);
 					SignalingMessage msg=new SignalingMessage(SignalingMessage.SIGNALING_TYPE_LOGIN_ACP,playerMsg);
 					sendMessage(msg);
 				}
@@ -144,36 +147,37 @@ public class PlayerAgent extends Thread {
 			//客户端创建新的gameTable,把table信息保存到agnet中，同时更新gameHall的table列表
 			InformationMessage tableMsg=sMsg.getInformation();
 			gameTable=tableMsg.getGameTable();
+			gamePlayer=gameTable.tempPlayer1;
 			gameHall.newTable(this);
+			gameTable.inTable(this);
 			break;
 		case SignalingMessage.SIGNALING_TYPE_IN_TABLE:
+			//TODO:用户进入table，此时会把新的table消息发上来，原用户为player1，新用户为player2
+			InformationMessage tableMsg2=sMsg.getInformation();
+			gameTable=tableMsg2.getGameTable();
+			//将自己的gamePlayer信息保存下来
+			if(gameTable.tempPlayer1.name.equals(gamePlayer.name))gamePlayer=gameTable.tempPlayer1;
+			else gamePlayer=gameTable.tempPlayer2;
+			gameTable=gameHall.inTable(gameTable, this);
+			//gameHall的inTable返回的是所进入的gameTable的对象
+			if(gameTable!=null)
+			{
+				gameTable.inTable(this);
+				//将自己的信息发送给对手
+				if(opponentPlayer!=null)
+				{
+					InformationMessage newPlayerInfo=new InformationMessage(InformationMessage.INFORMATION_TYPE_PLAYER,null,null,this.getGamePlayer());
+					SignalingMessage newPlayerMsg=new SignalingMessage(SignalingMessage.SIGNALING_TYPE_IN_TABLE,newPlayerInfo);
+					opponentPlayer.sendMessage(newPlayerMsg);
+				}
+			}
+			break;
+		case SignalingMessage.SIGNALING_TYPE_OUT_TABLE:
+			//TODO:用户退出table
+			gameTable.outTable(this);
+			gameHall.outTable(gameTable, this);
 			break;
 		}
-	}
-
-	private void playerLogin()
-	{
-		
-	}
-	
-	public void inGameHall()
-	{
-		
-	}
-	
-	public void outGameHall()
-	{
-		
-	}
-	
-	public void inTable()
-	{
-		
-	}
-	
-	public void outTable()
-	{
-		
 	}
 	
 	/* (non-Javadoc)
@@ -228,6 +232,20 @@ public class PlayerAgent extends Thread {
 	 */
 	public GamePlayer getGamePlayer() {
 		return gamePlayer;
+	}
+
+	/**
+	 * @return the opponentPlayer
+	 */
+	public PlayerAgent getOpponentPlayer() {
+		return opponentPlayer;
+	}
+
+	/**
+	 * @param opponentPlayer the opponentPlayer to set
+	 */
+	public void setOpponentPlayer(PlayerAgent opponentPlayer) {
+		this.opponentPlayer = opponentPlayer;
 	}
 
 	/**
