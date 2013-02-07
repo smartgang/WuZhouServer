@@ -81,6 +81,7 @@ public class PlayerAgent extends Thread {
 			}
 			catch(Exception e)
 			{
+				runningFlag=false;//出异常就断开
 				e.printStackTrace();
 			}
 		}
@@ -147,22 +148,22 @@ public class PlayerAgent extends Thread {
 			//客户端创建新的gameTable,把table信息保存到agnet中，同时更新gameHall的table列表
 			InformationMessage tableMsg=sMsg.getInformation();
 			gameTable=tableMsg.getGameTable();
-			gamePlayer=gameTable.tempPlayer1;
+			gamePlayer=gameTable.getTempPlayer(gamePlayer);
 			gameHall.newTable(this);
-			gameTable.inTable(this);
+			gameTable.createTable(this);
 			break;
 		case SignalingMessage.SIGNALING_TYPE_IN_TABLE:
 			//TODO:用户进入table，此时会把新的table消息发上来，原用户为player1，新用户为player2
 			InformationMessage tableMsg2=sMsg.getInformation();
 			gameTable=tableMsg2.getGameTable();
-			//将自己的gamePlayer信息保存下来
-			if(gameTable.tempPlayer1.name.equals(gamePlayer.name))gamePlayer=gameTable.tempPlayer1;
-			else gamePlayer=gameTable.tempPlayer2;
-			gameTable=gameHall.inTable(gameTable, this);
+			gamePlayer=gameTable.getTempPlayer(gamePlayer);
+			gameTable=gameHall.getTable(gameTable);
 			//gameHall的inTable返回的是所进入的gameTable的对象
 			if(gameTable!=null)
 			{
+				//将自己的gamePlayer信息保存下来
 				gameTable.inTable(this);
+				gamePlayer=gameTable.getTempPlayer(gamePlayer);
 				//将自己的信息发送给对手
 				if(opponentPlayer!=null)
 				{
@@ -171,11 +172,25 @@ public class PlayerAgent extends Thread {
 					opponentPlayer.sendMessage(newPlayerMsg);
 				}
 			}
+			
 			break;
 		case SignalingMessage.SIGNALING_TYPE_OUT_TABLE:
-			//TODO:用户退出table
+			//TODO:用户退出table,要返回gameHall信息知会
 			gameTable.outTable(this);
 			gameHall.outTable(gameTable, this);
+			InformationMessage gameHallInfor=new InformationMessage(InformationMessage.INFORMATION_TYPE_HALL,gameHall,null,null);
+			sendMessage(gameHallInfor);
+			break;
+		case SignalingMessage.SIGNALING_TYPE_INFO_EXIT:
+			try {
+				runningFlag=false;
+				din.close();
+				dout.close();
+				sc.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			break;
 		}
 	}

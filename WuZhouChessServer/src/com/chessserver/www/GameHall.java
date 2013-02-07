@@ -87,14 +87,13 @@ public class GameHall {
 		return table;
 	}
 
-	/**player进入GameTable
+	/**查找原GameTable
 	 * @param table
 	 * @param player
-	 * @return 返回所进入的gameTable对象
+	 * @return 返回查找的gameTable对象
 	 * 1.在tableList中找到要进入的table
-	 * 2.调用table的inTable函数，使玩家进入table中
 	 */
-	public GameTable inTable(GameTable table, PlayerAgent player)
+	public GameTable getTable(GameTable table)
 	{
 		GameTable gameTable=null;
 		int i=0;
@@ -109,13 +108,15 @@ public class GameHall {
 	/**用户退出table
 	 * @param table
 	 * @param player
-	 * 1.在tableList中找到要退出的table
+	 * 在此之前已经在PlayerAgent中调用过gameTable的outTable函数
+	 * 这里首先做用户的判断，如果outTable之后的用户数等于0，则将该tabe从列表中删除
 	 * 2.调用table中的outTable函数，使玩家退出table
 	 * 3.检查table中的用户数，如果为0，则删除该table
 	 */
 	public boolean outTable(GameTable table, PlayerAgent player)
 	{
 		GameTable gameTable=null;
+		if(table.playerNum>0)return true;
 		int i=0;
 		for(i=0;i<tableList.size();i++)
 		{

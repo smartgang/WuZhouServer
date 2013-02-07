@@ -88,31 +88,42 @@ public class GameTable {
 	 * 用户进行table
 	 * 1.判断如果是首个用户，则为新建table的用户
 	 * 2.如果进入后有两个用户，则要将新进入的用户信息发送给原用户
+	 * PS:在这里不对playerNum做计算，playerNum由客户端算好后发上来
 	 */
 	public boolean inTable(PlayerAgent player)
 	{
-		if(playerNum==2)return false;
-		playerNum++;
 		//将新加进来的player添加到为空的player中
-		PlayerAgent newPlayer,oldPlayer;
 		if(player1==null)
 		{
 			player1=player;
-			newPlayer=player1;
-			oldPlayer=player2;
+			tempPlayer1=player.getGamePlayer();
 		}
 		else 
 		{
 			player2=player;
-			newPlayer=player2;
-			oldPlayer=player1;
+			tempPlayer2=player.getGamePlayer();
 		}
+		playerNum++;
 		//如果此时有两个玩家，将进入table的消息，携带进入的player2信息发送给player1
 		if(playerNum==1)return true;
 		player1.setOpponentPlayer(player2);
 		player2.setOpponentPlayer(player1);
 		return true;
 	}
+	
+	/**
+	 * @param player
+	 * 用户创建table
+	 *用于在收到SIGNALING_TYPE_CREATE_TABLE消息是创建table使用
+	 *主要是做一些用户创建table时服务器需要额外做的事情
+	 */
+	public void createTable(PlayerAgent player)
+	{
+		playerNum=1;
+		player1=player;
+	}
+	
+	
 	//提供查询对手的功能
 	public PlayerAgent getOpponent(PlayerAgent player)
 	{
@@ -138,8 +149,7 @@ public class GameTable {
 				//player2不为空，则需要发送消息过去
 				if(player2!=null)
 				{
-					InformationMessage tableInfo=new InformationMessage(InformationMessage.INFORMATION_TYPE_TABLE,null,this,null);
-					SignalingMessage msg=new SignalingMessage(SignalingMessage.SIGNALING_TYPE_OUT_TABLE,tableInfo);
+					SignalingMessage msg=new SignalingMessage(SignalingMessage.SIGNALING_TYPE_OUT_TABLE,null);
 					player2.sendMessage(msg);
 				}
 				return;
@@ -242,6 +252,14 @@ public class GameTable {
 		this.tempPlayer2 = tempPlayer2;
 	}
 
+	public GamePlayer getTempPlayer(GamePlayer gamePlayer)
+	{
+		if(tempPlayer1!=null&&tempPlayer1.name.equals(gamePlayer.name))
+			return tempPlayer1;
+		else if(tempPlayer2!=null&&tempPlayer2.name.equals(gamePlayer.name))
+			return tempPlayer2;
+		return null;
+	}
 	/**
 	 * @param args
 	 */

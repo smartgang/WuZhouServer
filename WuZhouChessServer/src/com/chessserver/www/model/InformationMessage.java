@@ -15,7 +15,7 @@ import net.sf.json.JSONObject;
  */
 public class InformationMessage extends MessageBody {
 
-	private int informationType;
+	public int informationType;
 	private final static String InformationTypeKey="InformationTypeKey";
 	public final static int INFORMATION_TYPE_PLAYER=1;
 	public final static int INFORMATION_TYPE_HALL=2;
